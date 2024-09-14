@@ -5,7 +5,7 @@
 ## reference
 
 - Earth:  <a href=https://github.com/martynafford/natural-earth-geojson/blob/master/110m/physical/ne_110m_coastline.json>ne_110m_coastline.json</a> ← <a href=https://github.com/martynafford/natural-earth-geojson/tree/master>Natural Earth data in GeoJSON</a>
-- 衛星軌道データ: [NORAD GP Element Sets Current Data](http://celestrak.org/NORAD/elements/gp.php?GROUP=gnss&FORMAT=tle)
+- 衛星軌道データ: [NORAD GP Element Sets Current Data](http://celestrak.org/NORAD/elements/gp.php?GROUP=gnss&FORMAT=json)
 
 ## dependencies
 
