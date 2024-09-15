@@ -28,66 +28,16 @@ import { CSV } from "https://js.sabae.cc/CSV.js";
 import { deg2rad } from "https://code4fukui.github.io/ar-globe/deg2rad.js";
 import { lla2xyz } from "https://code4fukui.github.io/ar-globe/lla2xyz.js";
 import { createGlobe } from "https://code4fukui.github.io/ar-globe/createGlobe.js";
+import { TLE } from "https://uchuukaeru.github.io/ar-artificcial_satellite/tle.ts";
 
-async function fetchTle(dataUrl){
+async function fetchElementsData(dataUrl){
     let data;
     await fetch(dataUrl)
-        .then((response) => response.text())
+        .then((response) => response.json())
         .then((text) => {
             data=text;
         });
     return data;
-}
-
-class TLE{
-    SatelliteName;
-
-    Inclination;
-    RightAscensionOfTheAscendingNode;
-    Eccentricity;
-    ArgumentOfPerigee;
-    MeanAnomaly;
-    MeanMotion;
-    RevolutionNumberAtEpoch;
-
-    position = 0;
-
-    constructor(l0,l1,l2){
-      this.SatelliteName=l0;
-      // let l1item=l1.match(/^1 (?<SCN>\d{5})(?<Classific>S|U) (?<ID1>\d{2})(?<ID2>\d{3})(?<ID3>[A-Z ]{3}) (?<E1>\d{2})(?<E2>\d{3}\.\d{8}) (?<FD>(?:\+|\-| )\.\d{8}) (?<SD>(?:\+|\-| )\d{5}(?:\+|\-)\d) (?<B>(?:\+|\-| )\d{5}(?:\+|\-)\d) (?<ET>\d) /)
-      // console.log(l1,l1item.groups)
-      let l2item=l2.match(/2 (?<SCN>\d{5}) (?<Inc>(?:\d| ){3}\.\d{4}) (?<RGT>(?:\d| ){3}\.\d{4}) (?<Ecc>\d{7}) (?<AoP>(?:\d| ){3}\.\d{4}) (?<MA>(?:\d| ){3}\.\d{4}) (?<MM>(?:\d| ){2}\.\d{8})(?<RNaE>(?:\d| ){5})/).groups;
-      this.Inclination=parseFloat(l2item.Inc);
-      this.RightAscensionOfTheAscendingNode=parseFloat(l2item.RGT);
-      this.Eccentricity=parseFloat("0."+l2item.Ecc);
-      this.ArgumentOfPerigee=parseFloat(l2item.AoP);
-      this.MeanAnomaly=parseFloat(l2item.MA);
-      this.MeanMotion=parseFloat(l2item.MM);
-      this.RevolutionNumberAtEpoch=parseInt(l2item.RNaE);
-    }
-
-    status(){
-      console.log("Inc:",this.Inclination)
-      console.log("RGT:",this.RightAscensionOfTheAscendingNode)
-      console.log("Ecc:",this.Eccentricity)
-      console.log("AoP:",this.ArgumentOfPerigee)
-      console.log("MA :",this.MeanAnomaly)
-      console.log("MM :",this.MeanMotion)
-      console.log("RNE:",this.RevolutionNumberAtEpoch)
-    }
-}
-
-
-function splitTles(data){
-  let Satellites=[];
-  const line=data.split("\r\n").filter(function(v){
-    return ! v=="";
-  });
-  for(let i=0;i<line.length;i+=3){
-    Satellites.push(new TLE(line[i],line[i+1],line[i+2]));
-  }
-  Satellites[0].status()
-  return Satellites;
 }
 
 const r = .5;
@@ -99,21 +49,17 @@ const cy = 0;
 
 camera.position.y = 0; // 1.5;
 
-
-
-
 const createPointsEQ = async () => {
-  let data=await fetchTle("http://celestrak.org/NORAD/elements/gp.php?GROUP=gnss&FORMAT=json")
-
-  const tles=splitTles(data)
+  let data=await fetchElementsData("http://celestrak.org/NORAD/elements/gp.php?GROUP=gnss&FORMAT=json")
   
-  const vertices = [];
-  for (const dd of tles) {
+  const elements = [];
+  for (const dd of data) {
+    console.log(dd);
     
     // const p = lla2xyz(dd.lat, dd.lng, dd.alt);
     // vertices.push(p.x, p.y, p.z);
 
-    vertices.push(0,0,0);
+    // vertices.push(0,0,0);
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
