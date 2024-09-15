@@ -93,6 +93,10 @@ class TLE{
         return this.radius_short**2 / this.radius_long *(1+Math.cos(degToRad(this.angle)))
     }
 
+    public addAngle(angle:number){
+        this.angle=this.angle+angle;
+    }
+
     public getPosition3D():[number,number,number]{
         const [x,y]=cartesianToPolar(this.getRadius(),this.angle);
 
