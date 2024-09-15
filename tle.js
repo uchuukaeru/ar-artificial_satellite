@@ -1,5 +1,6 @@
 // 地球重力定数の３乗根
 const egc_cr = 73594.59595;
+const earthr = 12742 * 1000 / 2;
 
 class TLE{
     // 衛星名:String
@@ -97,7 +98,7 @@ class TLE{
         this.angle=this.angle+angle;
     }
 
-    getPosition3D(){ // :[number,number,number]
+    getPosition3D(r=1.0){ // :[number,number,number]
         const [x,y]=cartesianToPolar(this.getRadius(),this.angle);
 
         const incRad=degToRad(this.Inclination);
@@ -108,9 +109,9 @@ class TLE{
         const c2=Math.cos(ratRad);
         const s2=Math.sin(ratRad);
 
-        const x1 = x*c1 - y*s2;
-        const y1 = x*c1*s2 + y*c1*c2; // - z*s1;
-        const z1 = x*s1*s2 + y*s1*c1; // + z*c1;
+        const x1 = r+(x*c1 - y*s2)/earthr;
+        const y1 = r+(x*c1*s2 + y*c1*c2)/earthr; // - z*s1;
+        const z1 = r+(x*s1*s2 + y*s1*c1)/earthr; // + z*c1;
 
         return [x1 , y1 , z1];
     }
