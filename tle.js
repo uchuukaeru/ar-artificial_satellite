@@ -2,64 +2,64 @@
 const egc_cr = 73594.59595;
 
 class TLE{
-    // 衛星名
+    // 衛星名:String
     // "OBJECT_NAME":"GPS BIIR-2  (PRN 13)",
-    ObjectName:String;
-    //
+    ObjectName;
+    //:String
     // "OBJECT_ID":"1997-035A",
-    ObjectId:String;
-    // 衛星カタログ番号
+    ObjectId;
+    // 衛星カタログ番号:number
     // "NORAD_CAT_ID":24876,
-    NoradCatId:number;
-    // 分類
+    NoradCatId;
+    // 分類:String
     // "CLASSIFICATION_TYPE":"U",
-    ClassificationType:String;
-    // 原期
+    ClassificationType;
+    // 原期:String
     // "EPOCH":"2024-09-12T12:42:13.013856",
-    Epoch:String;
-    // 平均運動の1次微分値を2で割った値
+    Epoch;
+    // 平均運動の1次微分値を2で割った値:number
     // "MEAN_MOTION_DOT":2.0e-7,
-    MeanMotionDot:number;
-    // 平均運動の2次微分値を6で割った値
+    MeanMotionDot;
+    // 平均運動の2次微分値を6で割った値:number
     // "MEAN_MOTION_DDOT":0
-    MeanMotionDdot:number;
-    // B*抗力項
+    MeanMotionDdot;
+    // B*抗力項:number
     // "BSTAR":0,
-    BStar:number;
-    // この軌道要素を算出した軌道モデル (Ephemeris) の種別
+    BStar;
+    // この軌道要素を算出した軌道モデル (Ephemeris) の種別:number
     // "EPHEMERIS_TYPE":0,
-    EphemerisType:number;
-    // 軌道要素通番
+    EphemerisType;
+    // 軌道要素通番:number
     // "ELEMENT_SET_NO":999,
-    ElementSetNumber:number;
+    ElementSetNumber;
 
-    // 軌道傾斜角
+    // 軌道傾斜角:number
     // "INCLINATION":55.6956,
-    Inclination:number;
-    // 昇交点の赤経
+    Inclination;
+    // 昇交点の赤経:number
     // "RA_OF_ASC_NODE":123.7167,
-    RightAscensionOfTheAscendingNode:number;
-    // 離心率
+    RightAscensionOfTheAscendingNode;
+    // 離心率:number
     // "ECCENTRICITY":0.0084035,
-    Eccentricity:number;
-    // 近地点引数
+    Eccentricity;
+    // 近地点引数:number
     // "ARG_OF_PERICENTER":53.9679,
-    ArgumentOfPericenter:number;
-    // 平均近点角
+    ArgumentOfPericenter;
+    // 平均近点角:number
     // "MEAN_ANOMALY":306.895,
-    MeanAnomaly:number;
-    // 平均運動
+    MeanAnomaly;
+    // 平均運動:number
     // "MEAN_MOTION":2.00561092,
-    MeanMotion:number;
-    // 回転数
+    MeanMotion;
+    // 回転数:number
     // "REV_AT_EPOCH":19906,
-    RevolutionAtEpoch:number;
+    RevolutionAtEpoch;
 
-    radius_short:number;
-    radius_long:number;
-    angle:number = 0;
+    radius_short;
+    radius_long;
+    angle = 0;
 
-    constructor(elementJson:JSON){
+    constructor(elementJson){
         this.ObjectName=elementJson["OBJECT_NAME"];
         this.ObjectId=elementJson["OBJECT_ID"];
         this.NoradCatId=elementJson["NORAD_CAT_ID"];
@@ -82,22 +82,22 @@ class TLE{
         this.setRadius();
     }
 
-    private setRadius(){
+    setRadius(){
         this.radius_long = egc_cr / Math.cbrt(this.MeanMotion ** 2);
         this.radius_short = this.radius_long * Math.sqrt(1 - this.Eccentricity ** 2)
     }
 
-    private getRadius(){
+    getRadius(){
         // https://otaku-of-suri.hatenablog.com/entry/2016/11/27/174053
         // r= b**2 / a(1+e* Math.cos(angle))
         return this.radius_short**2 / this.radius_long *(1+Math.cos(degToRad(this.angle)))
     }
 
-    public addAngle(angle:number){
+    addAngle(angle){
         this.angle=this.angle+angle;
     }
 
-    public getPosition3D():[number,number,number]{
+    getPosition3D(){ // :[number,number,number]
         const [x,y]=cartesianToPolar(this.getRadius(),this.angle);
 
         const incRad=degToRad(this.Inclination);
@@ -108,24 +108,24 @@ class TLE{
         const c2=Math.cos(ratRad);
         const s2=Math.sin(ratRad);
 
-        const x1:number = x*c1 - y*s2;
-        const y1:number = x*c1*s2 + y*c1*c2; // - z*s1;
-        const z1:number = x*s1*s2 + y*s1*c1; // + z*c1;
+        const x1 = x*c1 - y*s2;
+        const y1 = x*c1*s2 + y*c1*c2; // - z*s1;
+        const z1 = x*s1*s2 + y*s1*c1; // + z*c1;
 
         return [x1 , y1 , z1];
     }
 }
 
-function degToRad(deg:number){
+function degToRad(deg){
     return deg*180/Math.PI;
 }
 
-function radToDeg(rad:number){
+function radToDeg(rad){
     return rad*Math.PI/180;
 }
 
-function cartesianToPolar(r:number,rad:number){
-    let x:number , y:number;
+function cartesianToPolar(r,rad){
+    let x , y;
     x = r * Math.sin(rad);
     y = r * Math.cos(rad);
     return [x,y];
