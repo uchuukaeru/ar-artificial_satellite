@@ -22,13 +22,13 @@
 </script>
 
 <script type="module">
+import { TLE } from "https://uchuukaeru.github.io/ar-artificial_satellite/tle.js";
 import { THREE, scene, camera, renderer } from "https://code4fukui.github.io/egxr.js/egxr.js";
 import { OrbitControls } from 'https://code4fukui.github.io/three.js_examples/jsm/controls/OrbitControls.js';
 import { CSV } from "https://js.sabae.cc/CSV.js";
 import { deg2rad } from "https://code4fukui.github.io/ar-globe/deg2rad.js";
 import { lla2xyz } from "https://code4fukui.github.io/ar-globe/lla2xyz.js";
 import { createGlobe } from "https://code4fukui.github.io/ar-globe/createGlobe.js";
-import { TLE } from "https://uchuukaeru.github.io/ar-artificial_satellite/tle.ts";
 
 async function fetchElementsData(dataUrl){
     let data;
@@ -54,7 +54,7 @@ const createPointsEQ = async () => {
   
   const elements = [];
   for (const elementData of data) {
-    console.log(dd);
+    console.log(elementData);
     
     const element = new TLE(elementData);
     element.getPosition3D().array.forEach(posi => {
