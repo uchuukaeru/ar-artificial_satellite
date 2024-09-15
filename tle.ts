@@ -1,72 +1,83 @@
-const line0=/^.{,24}\n$/g;
-// https://en.wikipedia.org/wiki/Two-line_element_set#Line_1
-const line1=/^1 (?<SCN>\d{5})(?<Classific>S|U) (?<ID1>\d{2})(?<ID2>\d{3})(?<ID3>[A-Z ]{3}) (?<E1>\d{2})(?<E2>\d{3}\.\d{9}) (?<FD>(\+|\-| )\.\d{8}) (?<SD>(\+|\-| )(\d){5}\-(.)) (?<B>(\+|\-| )(\d{5})\-(\d)) (?<ET>\d) (?<ESN>\d{4})(?<Checksum>\d)\n$/g;
-// https://en.wikipedia.org/wiki/Two-line_element_set#Line_2
-const line2=/^2 (?<SCN>\d{5}) (?<Inc>\d{3}\.\d{4}) (?<Right>\d{3}\.\d{4}) (?<Ecc>\d{7}) (?<AoP>\d{3}\.\d{4}) (?<MA>\d{3}\.\d{4}) (?<MM>\d{2}\.\d{8})(?<RNaE>\d{5})(?<Checksum>\d)\n$/g;
-
 // 地球重力定数の３乗根
 const egc_cr = 73594.59595;
 
 class TLE{
     // 衛星名
-    SatelliteName:String;
-
+    // "OBJECT_NAME":"GPS BIIR-2  (PRN 13)",
+    ObjectName:String;
+    //
+    // "OBJECT_ID":"1997-035A",
+    ObjectId:String;
     // 衛星カタログ番号
-    SatelliteCatalogNumber:number;
+    // "NORAD_CAT_ID":24876,
+    NoradCatId:number;
     // 分類
-    Classification:number;
-    // 国際衛星識別符号 (打上げ年のラスト2桁)
-    InternationalDesignatorYear:number;
-    // 国際衛星識別符号 (その年の打上げの通算番号)
-    InternationalDesignatorNum:number;
-    // 国際衛星識別符号（その打上げによる飛行体の通番
-    InternationalDesignatorSerial:number;
-    // この軌道要素の元期 (年のラスト2桁)
-    EpochYear:number;
-    // 元期 (続き)
-    EpochDay:number;
+    // "CLASSIFICATION_TYPE":"U",
+    ClassificationType:String;
+    // 原期
+    // "EPOCH":"2024-09-12T12:42:13.013856",
+    Epoch:String;
     // 平均運動の1次微分値を2で割った値
-    FirstDerivativeOfMeanMotion:number;
+    // "MEAN_MOTION_DOT":2.0e-7,
+    MeanMotionDot:number;
     // 平均運動の2次微分値を6で割った値
-    SecondDerivativeOfMeanMotion:number;
+    // "MEAN_MOTION_DDOT":0
+    MeanMotionDdot:number;
     // B*抗力項
-    BSTAR:number;
+    // "BSTAR":0,
+    BStar:number;
     // この軌道要素を算出した軌道モデル (Ephemeris) の種別
+    // "EPHEMERIS_TYPE":0,
     EphemerisType:number;
     // 軌道要素通番
+    // "ELEMENT_SET_NO":999,
     ElementSetNumber:number;
 
     // 軌道傾斜角
+    // "INCLINATION":55.6956,
     Inclination:number;
     // 昇交点の赤経
+    // "RA_OF_ASC_NODE":123.7167,
     RightAscensionOfTheAscendingNode:number;
     // 離心率
+    // "ECCENTRICITY":0.0084035,
     Eccentricity:number;
     // 近地点引数
-    ArgumentOfPerigee:number;
+    // "ARG_OF_PERICENTER":53.9679,
+    ArgumentOfPericenter:number;
     // 平均近点角
+    // "MEAN_ANOMALY":306.895,
     MeanAnomaly:number;
     // 平均運動
+    // "MEAN_MOTION":2.00561092,
     MeanMotion:number;
     // 回転数
-    RevolutionNumberAtEpoch:number;
+    // "REV_AT_EPOCH":19906,
+    RevolutionAtEpoch:number;
 
     radius_short:number;
     radius_long:number;
     angle:number = 0;
 
-    constructor(l0,l1,l2){
-        if(l1.SCN!=l2.SCN){
-            throw new Error("");
-        }
-        this.SatelliteName=l0[0];
-        this.Inclination=Number(l2.Inc);
-        this.RightAscensionOfTheAscendingNode=Number(l2.Right);
-        this.Eccentricity=Number(l2.Ecc);
-        this.ArgumentOfPerigee=Number(l2.AoP);
-        this.MeanAnomaly=Number(l2.MA);
-        this.MeanMotion=Number(l2.MM);
-        this.RevolutionNumberAtEpoch=Number(l2.RNaE);
+    constructor(elementJson:JSON){
+        this.ObjectName=elementJson["OBJECT_NAME"];
+        this.ObjectId=elementJson["OBJECT_ID"];
+        this.NoradCatId=elementJson["NORAD_CAT_ID"];
+        this.ClassificationType=elementJson["CLASSIFICATION_TYPE"];
+        this.Epoch=elementJson["EPOCH"];
+        this.MeanMotionDot=elementJson["MEAN_MOTION_DOT"];
+        this.MeanMotionDdot=elementJson["MEAN_MOTION_DDOT"];
+        this.BStar=elementJson["BSTAR"];
+        this.EphemerisType=elementJson["EPHEMERIS_TYPE"];
+        this.ElementSetNumber=elementJson["ELEMENT_SET_NO"];
+
+        this.Inclination=elementJson["INCLINATION"];
+        this.RightAscensionOfTheAscendingNode=elementJson["RA_OF_ASC_NODE"];
+        this.Eccentricity=elementJson["ECCENTRICITY"];
+        this.ArgumentOfPericenter=elementJson["ARG_OF_PERICENTER"];
+        this.MeanAnomaly=elementJson["MEAN_ANOMALY"];
+        this.MeanMotion=elementJson["MEAN_MOTION"];
+        this.RevolutionAtEpoch=elementJson["REV_AT_EPOCH"];
 
         this.setRadius();
     }
@@ -116,14 +127,3 @@ function cartesianToPolar(r:number,rad:number){
     return [x,y];
 }
 
-function splitTles(data){
-    let Satellites:Array<TLE> = new Array();
-    const line=data.split("\r\n").filter(function(v:string){
-        return !(v==="");8
-    });
-    for(let i=0;i<line.length;i+=3){
-        Satellites.push(new TLE(line[i].match(line0),line[i+1].match(line1),line[i+2].match(line2)));
-    }
-    // Satellites[0].status()
-    return Satellites;
-}
