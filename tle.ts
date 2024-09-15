@@ -127,3 +127,4 @@ function cartesianToPolar(r:number,rad:number){
     return [x,y];
 }
 
+export {TLE};
