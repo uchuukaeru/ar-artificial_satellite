@@ -53,16 +53,19 @@ const createPointsEQ = async () => {
   let data=await fetchElementsData("http://celestrak.org/NORAD/elements/gp.php?GROUP=gnss&FORMAT=json")
   
   const elements = [];
-  for (const dd of data) {
+  for (const elementData of data) {
     console.log(dd);
     
+    const element = new TLE(elementData);
+    element.getPosition3D().array.forEach(posi => {
+      elements.push(posi);
+    });
+    // elements.push(element.getPosition3D())
     // const p = lla2xyz(dd.lat, dd.lng, dd.alt);
     // vertices.push(p.x, p.y, p.z);
-
-    // vertices.push(0,0,0);
   }
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(elements, 3));
   const material = new THREE.PointsMaterial({ size: 0.01, color: 0xff0000 });
   return new THREE.Points(geometry, material);
 };
