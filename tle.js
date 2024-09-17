@@ -1,3 +1,5 @@
+import { THREE } from "https://code4fukui.github.io/egxr.js/egxr.js";
+
 // 地球重力定数の３乗根
 const egc_cr = 73594.59595;
 const earthr = 12742 * 1000 / 2;
@@ -98,7 +100,7 @@ class TLE{
         this.angle=this.angle+angle;
     }
 
-    getPosition3D(r=1.0){ // :[number,number,number]
+    getPosition3D(r){ // :[number,number,number]
         const [x,y]=cartesianToPolar(this.getRadius(),this.angle);
 
         const incRad=degToRad(this.Inclination);
@@ -114,6 +116,11 @@ class TLE{
         const z1 = r+(x*s1*s2 + y*s1*c1)/earthr; // + z*c1;
 
         return [x1 , y1 , z1];
+    }
+
+    getPositionGeometory(r=1.0){
+        const posi = this.getPosition3D(r);
+        return new THREE.Float32BufferAttribute(posi, 3);
     }
 }
 
