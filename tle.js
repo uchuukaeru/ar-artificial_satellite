@@ -120,7 +120,16 @@ class TLE{
 
     getPositionGeometory(r=1.0){
         const posi = this.getPosition3D(r);
-        return new THREE.Float32BufferAttribute(posi, 3);
+        return {x:posi[0],y:posi[1],z:posi[2]};
+    }
+
+    async getColor(){
+        const buf2hex = arrayBuffer => {
+            return [...new Uint8Array(arrayBuffer)]
+                .map(x => x.toString(16).padStart(2, '0')).join('');
+        }
+        const hash = await crypto.subtle.digest("SHA-1", data);
+        return buf2hex("0x"+hash.slice( 0, 6 ));
     }
 }
 
