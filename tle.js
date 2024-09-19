@@ -61,6 +61,7 @@ class TLE{
     radius_short;
     radius_long;
     angle = 0;
+    color;
 
     constructor(elementJson){
         this.ObjectName=elementJson["OBJECT_NAME"];
@@ -83,6 +84,7 @@ class TLE{
         this.RevolutionAtEpoch=elementJson["REV_AT_EPOCH"];
 
         this.setRadius();
+        this.setColor();
     }
 
     setRadius(){
@@ -123,7 +125,7 @@ class TLE{
         return {x:posi[0],y:posi[1],z:posi[2]};
     }
 
-    async getColor(){
+    async setColor(){
         const buf2hex = arrayBuffer => {
             return [...new Uint8Array(arrayBuffer)]
                 .map(x => x.toString(16).padStart(2, '0')).join('');
@@ -131,7 +133,7 @@ class TLE{
         const encoder = new TextEncoder();
         const data = encoder.encode(this.ObjectName);
         const hash = await crypto.subtle.digest("SHA-1", data);
-        return "0x"+buf2hex(hash).slice( 0, 6 );
+        this.color = "0x"+buf2hex(hash).slice( 0, 6 );
     }
 }
 
