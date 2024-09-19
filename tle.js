@@ -129,7 +129,7 @@ class TLE{
                 .map(x => x.toString(16).padStart(2, '0')).join('');
         }
         const hash = await crypto.subtle.digest("SHA-1", this.ObjectName);
-        return buf2hex("0x"+hash.slice( 0, 6 ));
+        return "0x"+buf2hex(hash).slice( 0, 6 );
     }
 }
 
