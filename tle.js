@@ -130,12 +130,16 @@ class TLE{
             return [...new Uint8Array(arrayBuffer)]
                 .map(x => x.toString(16).padStart(2, '0')).join('');
         }
-        const encoder = new TextEncoder();
-        const data = encoder.encode(this.ObjectName);
-        const hash = await crypto.subtle.digest("SHA-1", data);
-        this.color = parseInt("0x"+buf2hex(hash).slice( 0, 6 ),16);
+        const ab = string_to_buffer(this.ObjectName);
+        this.color = parseInt("0x"+buf2hex(ab).slice( 0, 6 ),16);
     }
 }
+
+function string_to_buffer(src) {
+    return (new Uint16Array([].map.call(src, function(c) {
+      return c.charCodeAt(0)
+    }))).buffer;
+  }
 
 function degToRad(deg){
     return deg*180/Math.PI;
