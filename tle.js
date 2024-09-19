@@ -128,7 +128,7 @@ class TLE{
             return [...new Uint8Array(arrayBuffer)]
                 .map(x => x.toString(16).padStart(2, '0')).join('');
         }
-        const hash = await crypto.subtle.digest("SHA-1", data);
+        const hash = await crypto.subtle.digest("SHA-1", this.ObjectName);
         return buf2hex("0x"+hash.slice( 0, 6 ));
     }
 }
