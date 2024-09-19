@@ -133,7 +133,7 @@ class TLE{
         const encoder = new TextEncoder();
         const data = encoder.encode(this.ObjectName);
         const hash = await crypto.subtle.digest("SHA-1", data);
-        this.color = "0x"+buf2hex(hash).slice( 0, 6 );
+        this.color = parseInt("0x"+buf2hex(hash).slice( 0, 6 ),16);
     }
 }
 
